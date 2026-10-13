@@ -1,0 +1,29 @@
+{
+  "extends": "../../../tsconfig.base.client.json",
+  "compilerOptions": { "rootDir": "src", "outDir": "lib/types" },
+  "include": ["src"],
+  "references": [
+    { "path": "../ui-primitives" },
+    { "path": "../ui-layout" },
+    { "path": "../shortcuts/tsconfig.client.json" },
+    { "path": "../../api/remotes/tsconfig.client.json" },
+    { "path": "../../util/values" },
+    { "path": "../../extensions/forge" },
+    { "path": "../../api/settings-controller" },
+    { "path": "../../../vendor/cordis" },
+    { "path": "../locale/tsconfig.client.json" },
+    { "path": "../ui-slots" },
+    { "path": "../ui-renderer" },
+    { "path": "../ui-session" },
+    { "path": "../ui-conversation/tsconfig.client.json" },
+    { "path": "../ui-chat/tsconfig.client.json" },
+    { "path": "../ui-deliverables/tsconfig.client.json" },
+    { "path": "../ui-sidebar-right" },
+    { "path": "../ui-sidebar-terminal" },
+    { "path": "../ui-sidebar" },
+    { "path": "../../api/session-controller/tsconfig.client.json" },
+    { "path": "../../api/terminal-controller/tsconfig.client.json" },
+    { "path": "../../llm/token-meter" },
+    { "path": "../../session/session-stats" }
+  ]
+}

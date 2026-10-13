@@ -12,6 +12,30 @@ import { seededController, TEST_LABELS } from './fixtures.client.ts'
 
 afterEach(() => { cleanup(); vi.restoreAllMocks() })
 
+it('shows three horizontal tools while preserving the existing body and both divider actions', () => {
+  const controller = seededController()
+  controller.setExpanded(true)
+  const first = getPane(controller.getSnapshot().state, controller.getSnapshot().state.rootId).tabs[0]!
+  const h = mounted(controller)
+  const original = h.body(first) as HTMLInputElement
+  original.value = '正在编辑'
+  act(() => {
+    controller.splitPane()
+    controller.openContent({ kind: 'file', contentId: 'file:b', title: 'B' })
+    controller.splitPane()
+    controller.openContent({ kind: 'file', contentId: 'file:c', title: 'C' })
+    h.redraw()
+  })
+  expect(h.body(first)).toBe(original)
+  expect(original.value).toBe('正在编辑')
+  expect(h.view.getByDisplayValue('B')).toBeTruthy()
+  expect(h.view.getByDisplayValue('C')).toBeTruthy()
+  const dividers = h.view.container.querySelectorAll('[data-dockkit-divider]')
+  expect(dividers).toHaveLength(2)
+  fireEvent.pointerDown(dividers[1]!)
+  expect(h.callbacks.onDividerPressed).toHaveBeenCalledWith(controller.getSnapshot().state.rootId, 1, expect.anything())
+})
+
 function mounted(controller = seededController(), options: Partial<ComponentProps<typeof TabLayout>> = {}) {
   const callbacks: PaneCallbacks = {
     onFocusTab: (id) => { controller.focusTab(id); redraw() },
@@ -187,14 +211,14 @@ it('renders an empty pane and rejects unsupported docked trees', () => {
   if (root.kind !== 'split') throw new Error('expected a split')
   vi.spyOn(console, 'error').mockImplementation(() => {})
   const suppress = (event: ErrorEvent): void => {
-    if (event.error instanceof Error && event.error.message === 'DockLayout requires one pane or two horizontally split panes') {
+    if (event.error instanceof Error && event.error.message === 'DockLayout requires horizontal panes') {
       event.preventDefault()
     }
   }
   window.addEventListener('error', suppress)
   try {
     expect(() =>{  h.redraw({ state: { ...state, nodes: { ...state.nodes, [root.id]: { ...root, axis: 'column' } } } }) })
-      .toThrow('two horizontally split panes')
+      .toThrow('horizontal panes')
   } finally {
     window.removeEventListener('error', suppress)
   }

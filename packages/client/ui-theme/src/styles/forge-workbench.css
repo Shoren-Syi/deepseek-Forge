@@ -1,0 +1,114 @@
+/* 雾蓝终端主题集中在主题包，功能模块只使用语义颜色。 */
+body[data-forge-workbench] {
+  --dsw-alias-bg-base: #fcfcfb;
+  --dsw-alias-bg-layer-2: #f3f5f8;
+  --dsw-specific-sidebar-fill: #f3f5f8;
+  --dsw-menu-surface-fill: #f3f5f8;
+  --dsw-specific-menu: var(--dsw-menu-surface-fill);
+  --dsw-alias-menu-group-header-fill: var(--dsw-menu-surface-fill);
+  --dsw-alias-label-primary: #343945;
+  --dsw-alias-label-secondary: #626978;
+  --dsw-alias-label-tertiary: #737d8f;
+  --dsw-alias-border-l1: #cbd4e2;
+  --dsw-alias-border-l2: #d5dce8;
+  --dsw-alias-border-l3: #e0e5ed;
+  --dsw-alias-link: #3f6cc4;
+  --dsw-alias-label-primary-bluish: #3f6cc4;
+  --dsw-alias-interactive-bg-hover: #e8edf5;
+  --dsw-alias-turn-trigger-bg: #f3f5f8;
+  --dsw-alias-turn-trigger-bg-hover: #ecf0f6;
+  --dsw-alias-markdown-code-block: #f3f5f8;
+  --dsw-alias-state-success-primary: #4e9675;
+  --forge-whale-D: #27478c;
+  --forge-whale-B: #7da1de;
+  --forge-whale-L: #abc2ec;
+  --forge-whale-W: #fcfcfb;
+  --forge-prompt-border: #abc2ec;
+  --dsw-radius-sm: 3px;
+  --dsw-radius-md: 4px;
+  --dsw-radius-lg: 4px;
+  --dsw-radius-xl: 4px;
+  --ds-font-family-code: 'Cascadia Code', 'Cascadia Mono', Consolas, 'Microsoft YaHei', monospace;
+  --ds-font-family: var(--ds-font-family-code);
+  font-family: var(--ds-font-family-code);
+  font-variant-numeric: tabular-nums;
+}
+body[data-forge-workbench][data-ds-dark-theme] {
+  --dsw-alias-bg-base: #171b22;
+  --dsw-alias-bg-layer-2: #202630;
+  --dsw-specific-sidebar-fill: #1c212a;
+  --dsw-menu-surface-fill: #202630;
+  --dsw-alias-label-primary: #e8e6e0;
+  --dsw-alias-label-secondary: #aab2c2;
+  --dsw-alias-label-tertiary: #8d95a6;
+  --dsw-alias-border-l1: #485365;
+  --dsw-alias-border-l2: #35404f;
+  --dsw-alias-border-l3: #2d3542;
+  --dsw-alias-link: #7da1de;
+  --dsw-alias-label-primary-bluish: #abc2ec;
+  --dsw-alias-interactive-bg-hover: #293345;
+  --dsw-alias-turn-trigger-bg: #202630;
+  --dsw-alias-turn-trigger-bg-hover: #242b3a;
+  --dsw-alias-markdown-code-block: #202630;
+  --dsw-alias-state-success-primary: #82b89d;
+  --forge-whale-D: #abc2ec;
+  --forge-whale-B: #5e88cc;
+  --forge-whale-L: #7da1de;
+  --forge-whale-W: #e8e6e0;
+  --forge-prompt-border: #55606f;
+}
+body[data-forge-workbench] [data-slot='conversation.header'] header {
+  background: var(--dsw-specific-sidebar-fill);
+  padding-inline: 20px;
+}
+body[data-forge-workbench] [data-conversation-tabs] { gap: 20px; }
+body[data-forge-workbench] [data-slot='conversation.session.header.lineage'] { font-size: 13px; }
+body[data-forge-workbench] [data-slot='conversation.hero.brand.mark'] { color: var(--dsw-alias-link); }
+body[data-forge-workbench] [data-slot='sidebar.right.pane.tab'] { background: var(--dsw-alias-bg-base); }
+body[data-forge-workbench] [data-slot='sidebar'] { font-size: 12px; }
+body[data-forge-workbench] [data-hero-headline]:has([data-forge-whale-hero]) { justify-content: flex-start; width: 100%; }
+body[data-forge-workbench] [data-hero-headline]:has([data-forge-whale-hero]) > span:first-child { width: 100%; }
+body[data-forge-workbench] [data-hero-headline]:has([data-forge-whale-hero]) [data-hero-title] { display: none; }
+body[data-forge-workbench] [data-composer-card] { border: 1px solid var(--forge-prompt-border); border-radius: 4px; box-shadow: none; background: var(--dsw-alias-bg-base); }
+body[data-forge-workbench] [data-composer-card]:focus-within { border-color: var(--dsw-alias-link); }
+/* 模型左侧只保留速度和上下文，缓存明细仍在检查器查看。 */
+body[data-forge-workbench] [data-composer-dock] { display: flex; gap: 6px; white-space: nowrap; flex: none; }
+body[data-forge-workbench] [data-composer-stat='usage'] { display: none; }
+/* 插件的滑块卡片与选择按钮使用实色，避免背景文字穿透。 */
+body[data-forge-workbench] .dsh-es-sliderWrap,
+body[data-forge-workbench] .dsh-es-trigger { background: var(--dsw-alias-bg-layer-2); }
+body[data-forge-workbench] [contenteditable='true'] { font-family: var(--ds-font-family-code); caret-color: var(--dsw-alias-link); }
+body[data-forge-workbench] [data-conversation-content] { --dsh-chat-content-width: calc(100% - 48px); --dsh-composer-card-max-width: calc(100% - 32px); }
+body[data-forge-workbench] [data-chat-flow-kind='turn-trigger'] > div { border-radius: 3px; border-color: var(--dsw-alias-border-l2); }
+body[data-forge-workbench] [data-chat-flow-kind='assistant-step'] { border-left: 2px solid var(--dsw-alias-border-l3); padding-left: 14px; }
+body[data-forge-workbench] [data-chat-flow-kind='user'] { border-left: 2px solid var(--dsw-alias-link); padding-left: 14px; }
+body[data-forge-workbench] [data-user-message-row],
+body[data-forge-workbench] [data-user-message-stack] { align-items: flex-start; max-width: 100%; }
+body[data-forge-workbench] [data-user-message-body] { background: var(--dsw-alias-bg-layer-2); width: 100%; box-sizing: border-box; border-radius: 2px; }
+body[data-forge-workbench] [data-chat-flow-kind='tool-call'] { border-left: 1px solid var(--dsw-alias-border-l2); padding-left: 14px; }
+body[data-forge-workbench] button:focus-visible { outline: 2px solid var(--dsw-alias-link); outline-offset: 3px; }
+/* 上方工具、下方对话、固定检查器分别占有明确区域。 */
+body[data-forge-workbench] [data-workbench-frame] {
+  --forge-inspector-width: 240px;
+  --forge-tools-height: clamp(160px, 30vh, 300px);
+  grid-template-columns: var(--dsh-sidebar-column-width) minmax(0, 1fr) var(--forge-inspector-width) !important;
+  grid-template-rows: var(--forge-tools-height) minmax(180px, 1fr) auto;
+  & > [data-navigation-col] { grid-column: 1; grid-row: 1 / 3; }
+  & > [data-rightbar-col] { grid-column: 2; grid-row: 1; position: relative; min-height: 0; border-bottom: 1px solid var(--dsw-alias-border-l2); }
+  & > [data-center-col] { grid-column: 2; grid-row: 2; }
+  & > [data-shell-bottom] { grid-column: 1 / -1; grid-row: 3; }
+  & > [data-side='rightbar'] { display: none; }
+  & [data-sidebar-right-panel='push'] { width: calc(100% - 100px) !important; height: 100%; --dsh-sidebar-width: 100% !important; }
+  & [role='tab']:has([data-sidebar-right-tab-kind='forge-inspector']) { display: none; }
+}
+body[data-forge-workbench] [data-workbench-frame][data-sidebar-collapsed] { --dsh-sidebar-column-width: 0px !important; }
+body[data-forge-workbench] [data-workbench-frame][data-sidebar-collapsed] > [data-navigation-col] { visibility: hidden; }
+body[data-forge-workbench] [data-workbench-frame]:has([data-sidebar-right-current][data-sidebar-right-open]) [data-forge-tools-placeholder] { display: none; }
+body[data-forge-workbench] [data-composer-card] { border: 0; border-top: 1px solid var(--forge-prompt-border); border-bottom: 1px solid var(--dsw-alias-border-l2); border-radius: 0; padding: 4px 0; gap: 4px; }
+body[data-forge-workbench] [data-composer-card]::before { content: '❯'; position: absolute; left: 0; top: 12px; color: var(--dsw-alias-link); pointer-events: none; }
+body[data-forge-workbench] [data-composer-card] [contenteditable='true'] { min-height: 26px; padding-left: 22px; }
+body[data-forge-workbench] [data-composer-card] [contenteditable='true']::before { font-style: normal; }
+body[data-forge-workbench] [data-sidebar-right-panel] [role='tab'] { box-sizing: border-box; min-width: 56px; padding-inline: 8px; font-size: 11px; }
+@media (max-width: 900px) {
+  body[data-forge-workbench] [data-workbench-frame] { --forge-inspector-width: 220px; }
+}

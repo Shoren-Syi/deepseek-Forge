@@ -188,10 +188,11 @@ function UserStyleBubble({
   return (
     <div
       className={css.userRow}
+      data-user-message-row
       data-pending-steering={pending || undefined}
       data-submission-echo={echo || undefined}
     >
-      <div className={css.userStack}>
+      <div className={css.userStack} data-user-message-stack>
         {attachments.length > 0 && (
           <div className={css.attachmentRow} data-message-attachments>
             {attachments.map((attachment, index) => attachment.type === 'image'
@@ -218,7 +219,7 @@ function UserStyleBubble({
               ))}
           </div>
         )}
-        {showBubble && <div className={css.bubble}>
+        {showBubble && <div className={css.bubble} data-user-message-body>
           {projectUserText(text, referenceLabels, skillNames, 'skill', references)}
           {rest.map((block, i) => <JsonBlock key={i} label={t('message.extraBlock')} payload={block} truncatedLabel={truncated} />)}
         </div>}

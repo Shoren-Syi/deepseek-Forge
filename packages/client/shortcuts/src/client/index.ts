@@ -80,6 +80,11 @@ export default class ShortcutsService extends Service implements Shortcuts {
     return () => { off(); this.syncDefinitions() }
   }
 
+  /** 界面按钮与原生命令菜单共用同一条执行路径。 */
+  invoke(id: Parameters<Shortcuts['invoke']>[0], context: Parameters<Shortcuts['invoke']>[1]): void {
+    this.registry.invoke(id, context)
+  }
+
   registerFixed(command: Parameters<Shortcuts['registerFixed']>[0]): () => void {
     const off = this.registry.registerFixed(command)
     this.syncDefinitions()

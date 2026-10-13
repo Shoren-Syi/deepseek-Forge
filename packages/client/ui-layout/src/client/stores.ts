@@ -67,20 +67,18 @@ type LayoutActions = {
 }
 
 /**
- * Create the layout panel store handle. For the sidebar the preference IS the
- * width, so closing it forgets its drag width — reopening restores the contract
- * default. The right panel initializes at 45% of the frame on first opening
- * and keeps that px preference across resizes and close. Drag writes clamp to
- * the current frame's range. Narrow sidebar toggles change only the expansion
- * override; opening the right panel clears that override.
- * @returns the store handle (spec + type + identity + factory in one).
+ * 创建布局存储。导航初始收起，重新展开时使用默认宽度。
+ * 原生面板首次打开采用窗口宽度的 28%，后续保留用户调整的像素宽度。
+ * 拖动遵守当前窗口的宽度范围；窄窗口的导航展开状态在打开面板时清除。
+ * @returns 包含规格、标识与实例工厂的布局存储。
  */
 export function createLayoutStore(): EngineStoreHandle<LayoutState, LayoutActions>  {
   const handle = defineStore({
     init: (): LayoutState => ({
       panelInfo: { activePanelId: null },
       layoutInfo: {
-        sidebar: SIDEBAR_DEFAULT,
+        // 启动时展开终端工作面，导航由用户按需打开。
+        sidebar: 0,
         viewportWidth: window.innerWidth,
         narrowExpanded: false,
         rightbar: null,

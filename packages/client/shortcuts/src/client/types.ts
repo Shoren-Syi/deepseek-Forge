@@ -135,4 +135,10 @@ export interface Shortcuts {
    * @returns disposer removing the binding and catalog entry.
    */
   register(command: ShortcutCommand): () => void
+  /**
+   * 通过界面入口调用已注册命令，沿用命令的目标解析与模态约束。
+   * @param id - 已注册命令标识。
+   * @param context - 当前输入区域、模态状态与目标元素。
+   */
+  invoke(id: ShortcutCommandId, context: ShortcutContext): void
 }

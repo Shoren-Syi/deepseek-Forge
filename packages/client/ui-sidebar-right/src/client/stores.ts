@@ -37,6 +37,7 @@ import {
   planSetMode, planSettle, planSplitPane, planUnfloatPane, record, replay, stepBack, stepForward,
 } from '@deepseek-ai/dsh-client-ui-dockkit'
 import { GUIDE_KIND, pageAddress, type SidebarRightSeed } from './contract/seed.ts'
+import { MAX_TOOL_PANES } from './contract/layout.ts'
 
 /** One session's docking surface: the layout, its sequence, and the id counter. */
 export interface SurfaceState {
@@ -288,7 +289,7 @@ export function createSidebarRightStore(
       // actions return nothing; it is not called when nothing was split.
       splitPane: (d, sessionId: string, paneId?: PaneId, settled?: (paneId: PaneId) => void) => {
         d.bySession = seat(d, sessionId, (s) => {
-          const next = advance(s, (state, mint, makeTab) => dockPaneIds(state).length >= 2
+          const next = advance(s, (state, mint, makeTab) => dockPaneIds(state).length >= MAX_TOOL_PANES
             || getPane(state, paneId ?? activeDockPaneId(state)).tabs.length === 0
             ? []
             : planSplitPane(state, mint, paneId, makeTab), seed)
@@ -388,7 +389,7 @@ export function createSidebarRightStore(
       dropTab: (d, sessionId: string, tabId: TabId, paneId: PaneId, zone: DockZone) => {
         d.bySession = seat(d, sessionId, s => advance(s, (state, mint, makeTab) => {
           if (zone === 'top' || zone === 'bottom') return []
-          if (zone !== 'center' && dockPaneIds(state).length >= 2) return []
+          if (zone !== 'center' && dockPaneIds(state).length >= MAX_TOOL_PANES) return []
           const plan = (): readonly LayoutOp[] => planDropTab(state, mint, tabId, paneId, zone, makeTab)
           return zone === 'center' ? arriving(state, tabId, paneId, plan) : plan()
         }, seed))

@@ -199,14 +199,24 @@ describe('SidebarRightController — opening', () => {
     controller.openResource('dsh-resource://file/session/s-test/a.txt', { preferNewPane: true })
     const a = tabOf('a.txt')
     const pane = findTabPane(layout(), a)
-    expect(dockPaneIds(layout())).toHaveLength(2)
+    expect(dockPaneIds(layout())).toHaveLength(1)
     expect(pane.tabs).toEqual([a])
     expect(entries()).toBe(before + 1)
 
     publish()
     controller.openResource('dsh-resource://file/session/s-test/b.txt', { preferNewPane: true })
     expect(dockPaneIds(layout())).toHaveLength(2)
-    expect(findTabPane(layout(), tabOf('b.txt')).id).toBe(pane.id)
+    const thirdPane = findTabPane(layout(), tabOf('b.txt'))
+    expect(thirdPane.id).not.toBe(pane.id)
+    publish()
+    controller.openResource('dsh-resource://file/session/s-test/c.txt', { preferNewPane: true })
+    expect(dockPaneIds(layout())).toHaveLength(3)
+    const lastPane = findTabPane(layout(), tabOf('c.txt'))
+    expect(lastPane.id).not.toBe(thirdPane.id)
+    publish()
+    controller.openResource('dsh-resource://file/session/s-test/d.txt', { preferNewPane: true })
+    expect(dockPaneIds(layout())).toHaveLength(3)
+    expect(findTabPane(layout(), tabOf('d.txt')).id).toBe(lastPane.id)
   })
 
   it('falls back when the pane is too narrow and reveals existing content without splitting', () => {
@@ -468,8 +478,8 @@ describe('SidebarRightController — layout operations', () => {
     publish()
     const [float] = layout().floats
     expect(controller.split(float)).toBeUndefined()
-    // The budget: split to two panes, then no more.
-    while (dockPaneIds(layout()).length < 2) {
+    // 工具区最多分成三个面板，达到上限后不再分栏。
+    while (dockPaneIds(layout()).length < 3) {
       expect(controller.split(dockPaneIds(layout()).at(-1))).toBeDefined()
       publish()
     }

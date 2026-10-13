@@ -242,6 +242,8 @@ function sessionVisible(
   archivedFilter: ArchivedFilter,
 ): boolean {
   if (session.origin === 'subagent') return false
+  // Forge 辅助任务由专用结果面板展示，不把内部请求带入普通会话导航。
+  if (session.id.startsWith('forge-aux-')) return false
   if (session.blank && session.id !== current) return false
   switch (archivedFilter) {
     case 'default':

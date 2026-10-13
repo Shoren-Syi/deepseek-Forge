@@ -33,7 +33,7 @@ export type AppFrameProps =
 
 /** Center column grid item (session-body building block). */
 function CenterColumn(props: { children?: ReactNode }) {
-  return <div className={css.centerCol}>{props.children}</div>
+  return <div className={css.centerCol} data-center-col>{props.children}</div>
 }
 
 /** Subscribe to the main key without subscribing the column frame to each panel id. */
@@ -260,12 +260,15 @@ export function AppFrame({
       ref={frameRef}
       className={css.frame}
       style={{
+        '--dsh-sidebar-column-width': `${cols.sidebar}px`,
+        '--dsh-rightbar-column-width': `${cols.rightbar}px`,
         ...(document.documentElement.hasAttribute('data-windows-titlebar')
           ? { '--dsh-windows-sidebar-width': `${cols.sidebar}px` } : {}),
         gridTemplateColumns:
           `${cols.sidebar}px minmax(${cols.rightbar === 0 ? 0 : CENTER_MIN}px, 1fr) minmax(0px, ${rightbarMax}px)`,
-      }}
+      } as React.CSSProperties}
       data-sidebar-collapsed={sidebarCollapsed || undefined}
+      data-workbench-frame
       data-rightbar-collapsed={cols.rightbar === 0 || undefined}
       data-rightbar-fullscreen={layoutInfo.rightbarFullscreen || undefined}
       data-rightbar-instant={layoutInfo.rightbarInstant || undefined}
@@ -277,7 +280,7 @@ export function AppFrame({
         useSessions={useSessions}
         usePanelInfo={usePanelInfo}
       />
-      <div className={css.sidebarCol}>
+      <div className={css.sidebarCol} data-navigation-col>
         {sidebar}
       </div>
       <>

@@ -48,6 +48,12 @@ const view = (expandedGroups: readonly string[] = [], ungroupedOrder?: readonly 
   ...(ungroupedOrder === undefined ? {} : { ungroupedOrder }),
 })
 const noArchive: readonly SessionId[] = []
+
+it('辅助任务不进入普通会话导航，主会话仍可见', () => {
+  const main = summary('session-main', 1)
+  const auxiliary = summary('forge-aux-session-main--workspace-test', 2)
+  expect(visibleSessionIds(list(main, auxiliary), noArchive, 'default')).toEqual([main.id])
+})
 const noAttention: SessionStatusSnapshot = new Map()
 const status = (
   pendingInteraction: SessionPendingInteraction | undefined,

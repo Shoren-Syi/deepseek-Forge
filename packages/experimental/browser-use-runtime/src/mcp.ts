@@ -12,6 +12,7 @@ import type {} from '@deepseek-ai/dsh-browser-use'
 import type {} from '@deepseek-ai/dsh-tools'
 import type {} from '@deepseek-ai/dsh-system-prompt'
 import type {} from '@deepseek-ai/dsh-working-directory'
+import type {} from '@deepseek-ai/dsh-agent-preset-registry'
 
 /** Browser launch settings shared by the MCP integrations. */
 export interface BrowserMcpLaunchConfig {
@@ -104,6 +105,7 @@ export function mountSessionMcp(ctx: Context, options: SessionMcpOptions): void 
   if (workingDirectory === undefined) throw new Error(`${options.name}: browser MCP requires a working-directory provider`)
   let resources!: SessionResources<Scope>
   const clients = new Map<Agent, ClientState>()
+  const selected = new WeakSet<Agent>()
   const toolPrefix = `mcp__${options.name}__`
   const resourceTools = new Set(['list_mcp_resources', 'list_mcp_resource_templates', 'read_mcp_resource'])
   let stopping = false
@@ -178,7 +180,9 @@ export function mountSessionMcp(ctx: Context, options: SessionMcpOptions): void 
       clients.clear()
     }
   }, `${options.name}.sessions`)
-  ctx.on('agent/created', async ({ agent, signal }) => {
+  // 空白会话切换预设不会再次创建 Agent，首轮提示装配也需接入浏览器。
+  const activate = async (agent: Agent, signal?: AbortSignal): Promise<undefined> => {
+    if (clients.has(agent)) return
     const state: ClientState = { status: resources.available(agent) ? 'ready' : 'blocked' }
     agent.ctx.effect(() => async () => {
       clients.delete(agent)
@@ -191,7 +195,12 @@ export function mountSessionMcp(ctx: Context, options: SessionMcpOptions): void 
     }
     await resources.get(agent, signal)
     clients.set(agent, state)
-  }, { prepend: true })
+  }
+  ctx.on('agent/created', ({ agent, signal }) => activate(agent, signal), { prepend: true })
+  ctx.on('agent-preset/selected', (sessionId) => {
+    const agent = ctx.agents.get(sessionId)
+    if (agent !== undefined) selected.add(agent)
+  })
   ctx.on('tools/change', refreshBlockedMasks)
   ctx.on('tools/execute', async (exec, next) => {
     const ownResource = resourceTools.has(exec.name)
@@ -212,7 +221,13 @@ export function mountSessionMcp(ctx: Context, options: SessionMcpOptions): void 
       }
     })
   })
-  ctx.on('system-prompt/assemble', async (_assembly, { agent }, next) => {
+  ctx.on('system-prompt/assemble', async (_assembly, context, next) => {
+    const { agent } = context
+    if (agent !== undefined && selected.has(agent) && !clients.has(agent)) {
+      await activate(agent)
+      // 工具收集先于装配事件；首次连接后重新收集，后续轮次直接复用。
+      return ctx.systemPrompt.assemble(context)
+    }
     const assembly = await next()
     if (agent === undefined || clients.get(agent)?.status === 'ready') return assembly
     return { ...assembly, sections: assembly.sections.filter(section => section.name !== `mcp:${options.name}`) }

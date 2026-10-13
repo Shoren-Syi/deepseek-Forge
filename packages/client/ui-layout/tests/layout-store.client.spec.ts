@@ -8,12 +8,12 @@ beforeEach(() => { vi.stubGlobal('innerWidth', 1920) })
 afterEach(() => { vi.unstubAllGlobals(); vi.restoreAllMocks() })
 
 describe('createLayoutStore', () => {
-  it('starts with the default sidebar and no right panel preference', () => {
+  it('starts with collapsed navigation and no right panel preference', () => {
     const { store } = createLayoutStore().create()
     expect(store.getSnapshot()).toEqual({
       panelInfo: { activePanelId: null },
       layoutInfo: {
-        sidebar: 280,
+        sidebar: 0,
         viewportWidth: 1920,
         narrowExpanded: false,
         rightbar: null,
@@ -31,15 +31,15 @@ describe('createLayoutStore', () => {
     const b = createLayoutStore().create()
     a.actions.setSidebar(400)
     a.actions.openRightbar(true, false)
-    expect(b.store.getSnapshot().layoutInfo.sidebar).toBe(280)
+    expect(b.store.getSnapshot().layoutInfo.sidebar).toBe(0)
     expect(b.store.getSnapshot().layoutInfo.rightbar).toBeNull()
     expect(write).not.toHaveBeenCalled()
   })
 
-  it('clamps the sidebar to 264–420px', () => {
+  it('clamps the sidebar to 200–420px', () => {
     const { store, actions } = createLayoutStore().create()
     actions.setSidebar(1)
-    expect(store.getSnapshot().layoutInfo.sidebar).toBe(264)
+    expect(store.getSnapshot().layoutInfo.sidebar).toBe(200)
     actions.setSidebar(9999)
     expect(store.getSnapshot().layoutInfo.sidebar).toBe(420)
   })
@@ -50,7 +50,7 @@ describe('createLayoutStore', () => {
     actions.toggleSidebar()
     expect(store.getSnapshot().layoutInfo.sidebar).toBe(0)
     actions.toggleSidebar()
-    expect(store.getSnapshot().layoutInfo.sidebar).toBe(280)
+    expect(store.getSnapshot().layoutInfo.sidebar).toBe(224)
   })
 
   it('keeps the sidebar preference while toggling its narrow override', () => {
@@ -140,18 +140,18 @@ describe('main panel selection', () => {
 })
 
 describe('right panel', () => {
-  it('initializes at 45% of the latest frame only on first opening', () => {
+  it('initializes at 28% with a 300px floor only on first opening', () => {
     const { store, actions } = createLayoutStore().create()
     actions.setViewportWidth(1000)
     expect(store.getSnapshot().layoutInfo.rightbar).toBeNull()
     actions.openRightbar(true, false)
-    expect(store.getSnapshot().layoutInfo.rightbar).toBe(450)
+    expect(store.getSnapshot().layoutInfo.rightbar).toBe(300)
     actions.setViewportWidth(2000)
     actions.openRightbar(true, true)
-    expect(store.getSnapshot().layoutInfo.rightbar).toBe(450)
+    expect(store.getSnapshot().layoutInfo.rightbar).toBe(300)
     actions.closeRightbar()
     actions.openRightbar(true, false)
-    expect(store.getSnapshot().layoutInfo.rightbar).toBe(450)
+    expect(store.getSnapshot().layoutInfo.rightbar).toBe(300)
   })
 
   it('keeps track and fullscreen reports independent and clears both on close', () => {

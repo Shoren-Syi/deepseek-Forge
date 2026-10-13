@@ -63,6 +63,8 @@ export interface Config {
   runnerFailureSignatures?: string[]
   /** Positive timeout for each functional probe; zero would mean unbounded to Node. */
   probeTimeoutMs?: number
+  /** Windows ACL 启动器使用的独立 Node；省略时沿用当前进程。 */
+  windowsAclRunnerNode?: string
 }
 
 /** Probe whether `bwrap` can create the profile; the provider caches the bounded result. */
@@ -255,6 +257,7 @@ export class LocalSandboxProvider extends SandboxProvider {
     runnerCommand: z.array(z.string()).default([]),
     runnerFailureSignatures: z.array(z.string()).default([]),
     probeTimeoutMs: z.natural().default(5_000),
+    windowsAclRunnerNode: z.string(),
   })
 
   /** Test hook (mirrors the bash executors' `internals`). */
@@ -263,6 +266,7 @@ export class LocalSandboxProvider extends SandboxProvider {
   private readonly runnerCommand: string[] | undefined
   private readonly configuredRunnerFailureSignatures: string[]
   private readonly probeTimeoutMs: number
+  private readonly windowsAclRunnerNode: string
   /** Cached chain verdict; undefined until the first confined wrap needs it. */
   private selectedRunner: SelectedRunner | 'unavailable' | undefined
   /**
@@ -294,6 +298,7 @@ export class LocalSandboxProvider extends SandboxProvider {
     this.runnerCommand = runner.length > 0 ? runner : undefined
     this.configuredRunnerFailureSignatures = runnerFailureSignatures
     this.probeTimeoutMs = config.probeTimeoutMs as number
+    this.windowsAclRunnerNode = config.windowsAclRunnerNode ?? process.execPath
     assertPositiveFinite('probeTimeoutMs', this.probeTimeoutMs)
     // An operator-supplied runner does not use the ACL backend. The registry
     // remains optional and may be mounted after this provider.
@@ -572,11 +577,11 @@ export class LocalSandboxProvider extends SandboxProvider {
     const override = this.internals.windowsAclRunnerArgs
     if (override !== undefined) return override
     const builtEntry = this.internals.windowsAclRunnerEntry ?? fileURLToPath(import.meta.resolve('@deepseek-ai/dsh-sandbox-windows-acl/runner'))
-    if (existsSync(builtEntry)) return [process.execPath, builtEntry]
+    if (existsSync(builtEntry)) return [this.windowsAclRunnerNode, builtEntry]
     const sourceEntry = fileURLToPath(import.meta.resolve('@deepseek-ai/dsh-sandbox-windows-acl/src/runner.ts'))
     const sourceConfig = fileURLToPath(new URL('../../../../tsconfig.base.json', import.meta.url))
     const registration = `import { register } from ${JSON.stringify(import.meta.resolve('tsx/esm/api'))}; register({ tsconfig: ${JSON.stringify(sourceConfig)} });`
-    return [process.execPath, '--import', `data:text/javascript,${encodeURIComponent(registration)}`, sourceEntry]
+    return [this.windowsAclRunnerNode, '--import', `data:text/javascript,${encodeURIComponent(registration)}`, sourceEntry]
   }
 }
 

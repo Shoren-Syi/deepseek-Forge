@@ -2828,6 +2828,19 @@ describe('ChatView', () => {
     expect(processRow.getAttribute('hidden')).toBe('until-found')
   }))
 
+  it('预算阻断的回合显示暂停，不显示完成或完成耗时', () => {
+    const snapshot = chatSnapshotFixture({
+      nodes: [user(1, 'question'), assistant(2, 'partial', 1, 1)],
+      turnEnds: new Map([[1, 3]]),
+      turnTimings: new Map([[1, { startTime: 0, endTime: 5000 }]]),
+      turnEndReasons: new Map([[1, { kind: 'blocked' }]]),
+    })
+    const h = makeHarness({}, {}, snapshot)
+    const view = render(<h.ChatView {...h.props} />)
+    expect(turnProcessControl(view.container)?.textContent).toBe('已暂停')
+    expect(view.container.textContent).not.toContain('已完成')
+  })
+
   it('folds a recorded Turn end independently of remaining history or a loaded start', () => {
     const h = makeHarness({
       nodes: [

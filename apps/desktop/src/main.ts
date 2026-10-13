@@ -1,10 +1,11 @@
+import { forgeDesktop } from './forge-desktop.ts'
 import type { ProductEventMap, ProductEvent } from '@deepseek-ai/dsh-client-product-analytics/types'
 import { WINDOWS_TITLEBAR_HEIGHT } from './windows-layout.ts'
 /** Electron shell: desktop project ownership, custom protocol, windows, and lifecycle. */
 
 import { readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 import {
   app,
   BrowserWindow,
@@ -157,7 +158,8 @@ function runtimeResources(): RuntimeResources {
     ?? (development ? join(app.getAppPath(), 'node_modules', 'pnpm', 'bin', 'pnpm.mjs')
       : join(process.resourcesPath, 'runtime', 'primary-runtime', 'dependencies', 'pnpm', 'bin', 'pnpm.mjs'))
   const dsh = (development ? process.env.DSH_DESKTOP_DSH_DIR : undefined)
-    ?? (development ? join(app.getAppPath(), '.desktop-build', 'development', 'project') : join(app.getAppPath(), 'dsh'))
+    ?? (development ? join(app.getAppPath(), '.desktop-build', 'development', 'project')
+      : join(forgeDesktop ? process.resourcesPath : app.getAppPath(), 'dsh'))
   return { node, nodeBin, pnpm, dsh }
 }
 
@@ -229,6 +231,7 @@ function createWindow(preload: string, show = false, primary = false): BrowserWi
     } : {}),
     webPreferences: {
       preload,
+      ...(forgeDesktop ? { additionalArguments: ['--forge-edition'] } : {}),
       nodeIntegration: false,
       contextIsolation: true,
       sandbox: true,
@@ -319,11 +322,20 @@ async function main(): Promise<void> {
   const journalDirectory = process.env.DSH_DESKTOP_UPDATE_JOURNAL_DIR
   const updateJournal = journalDirectory === undefined ? undefined : new DesktopUpdateJournal(journalDirectory, app.getVersion())
   const resources = runtimeResources()
+  if (forgeDesktop) {
+    const assets = app.isPackaged ? join(process.resourcesPath, 'forge') : join(app.getAppPath(), '..', '..', 'forge')
+    const { initializeForgeProfiles } = await import(pathToFileURL(join(assets, 'profile.mjs')).href)
+    await initializeForgeProfiles(process.env.DSH_HOME, join(resources.dsh, 'node_modules', '@deepseek-ai', 'cordis-plugin-include', 'package.json'))
+  }
   const paths = resolveDesktopPaths()
   const development = !app.isPackaged
   const primaryRuntime = development
     ? developmentPrimaryRuntime()
     : join(process.resourcesPath, 'runtime', 'primary-runtime')
+  if (forgeDesktop) {
+    process.env.FORGE_PRIMARY_RUNTIME = primaryRuntime
+    process.env.FORGE_NODE = join(primaryRuntime, 'dependencies', 'node', 'bin', process.platform === 'win32' ? 'node.exe' : 'node')
+  }
   const activeProject = paths.profile
   const manager = new DesktopProjectManager(paths, resources)
   // Dock and Finder launches inherit only launchd's environment; every Host shares one login-shell read.
@@ -1229,7 +1241,7 @@ async function main(): Promise<void> {
     window.focus()
   }
 
-  if (app.isPackaged || process.env.DSH_DESKTOP_DEV_APP === '1') app.setAsDefaultProtocolClient('dsh')
+  if (!forgeDesktop && (app.isPackaged || process.env.DSH_DESKTOP_DEV_APP === '1')) app.setAsDefaultProtocolClient('dsh')
   app.on('open-url', (event, url) => {
     event.preventDefault()
     if (url === 'dsh://open' || url === 'dsh://open/') focusPrimaryWindow()
@@ -1291,7 +1303,7 @@ async function main(): Promise<void> {
   const policyInput: unknown = app.isPackaged
     ? ('dshMandatoryUpdatePolicy' in manifest ? manifest.dshMandatoryUpdatePolicy : undefined)
     : developmentPolicy === undefined ? undefined : JSON.parse(developmentPolicy) as unknown
-  const policyConfig = resolveDesktopPolicyConfig(policyInput, !app.isPackaged)
+  const policyConfig = resolveDesktopPolicyConfig(policyInput, !app.isPackaged || forgeDesktop)
   if (policyConfig !== undefined) {
     if (policyConfig.authentication === 'feishu-test') {
       policyAuth = new DesktopPolicyTestAuth(policyConfig.origin, policyConfig.allowedAuthOrigins, locale,

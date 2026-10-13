@@ -20,15 +20,17 @@ export const TurnProcessNodeView = memo(function TurnProcessNodeView({
   const reason = turn.end?.data.reason.kind
   const elapsedMs = turn.start === undefined || turn.end === undefined ? undefined
     : Math.max(1000, turn.end.time - turn.start.time)
-  const duration = elapsedMs === undefined || reason === 'aborted' || reason === 'error' ? undefined
+  const duration = elapsedMs === undefined || reason === 'aborted' || reason === 'error' || reason === 'blocked' ? undefined
     : formatRunDuration(elapsedMs, t)
-  // Other end reasons retain elapsed time; only cancellation and failure replace it.
+  // 暂停、取消和失败不使用完成标签，避免把预算阻断显示成任务完成。
   const label = reason === 'aborted' ? t('message.stopped')
     : reason === 'error' ? t('message.turnProcess.failed')
+      : reason === 'blocked' ? t('message.turnProcess.blocked')
       : duration === undefined ? t('message.turnProcess.worked')
         : t('message.turnProcess.took')
   const announcement = reason === 'aborted' ? t('message.stopped')
     : reason === 'error' ? t('message.turnProcess.failed')
+      : reason === 'blocked' ? t('message.turnProcess.blocked')
       : t('message.turnProcess.worked')
   return (
     <>

@@ -110,10 +110,10 @@ function TabHost({ state, callbacks, intents, tab, pane, column, floats, focusRe
 }
 
 /**
- * One or two horizontal panes; CSS resolves content sizes from track fractions.
- * @param props - committed layout, gesture preview and body retention policy.
- * @returns stable tab containers, including floating tabs.
- * @throws if the docked tree is not one pane or two horizontal panes.
+ * 渲染水平面板行，按模型比例分配宽度，并保持标签内容的 DOM 归属。
+ * @param props - 已提交布局、拖动预览与内容保留规则。
+ * @returns 稳定的标签容器及浮动面板。
+ * @throws 根布局不是单面板或水平分栏时抛出错误。
  */
 export function TabLayout(props: LayoutProps): ReactNode {
   const { state, callbacks, preview } = props
@@ -128,8 +128,8 @@ export function TabLayout(props: LayoutProps): ReactNode {
     },
   }
   const root = getNode(state, state.rootId)
-  if (root.kind === 'split' && (root.axis !== 'row' || root.children.length !== 2)) {
-    throw new Error('DockLayout requires one pane or two horizontally split panes')
+  if (root.kind === 'split' && root.axis !== 'row') {
+    throw new Error('DockLayout requires horizontal panes')
   }
   const panes = root.kind === 'pane' ? [root] : root.children.map(id => getPane(state, id))
   const sizes = root.kind === 'split' ? preview?.splitId === root.id ? preview.sizes : root.sizes : [1]
@@ -149,9 +149,9 @@ export function TabLayout(props: LayoutProps): ReactNode {
           <TabPanel state={state} pane={pane} callbacks={callbacks} />
         </div>
       ))}
-      {root.kind === 'split' && <div className={clsx(css.divider, css.tabLayoutDivider)}
-        data-dockkit-divider={`${root.id}:0`} style={{ gridColumn: 2, gridRow: 1 }}
-        onPointerDown={(event) => { callbacks.onDividerPressed(root.id, 0, event) }} />}
+      {root.kind === 'split' && root.children.slice(1).map((_, index) => <div key={`${root.id}:${index}`} className={clsx(css.divider, css.tabLayoutDivider)}
+        data-dockkit-divider={`${root.id}:${index}`} style={{ gridColumn: index * 2 + 2, gridRow: 1 }}
+        onPointerDown={(event) => { callbacks.onDividerPressed(root.id, index, event) }} />)}
     </div>
   )
 }

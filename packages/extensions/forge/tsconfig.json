@@ -1,0 +1,20 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": { "rootDir": "src", "outDir": "lib/types" },
+  "include": ["src"],
+  "references": [
+    { "path": "../../core/agent-default-model" },
+    { "path": "../../llm/llm-retry" },
+    { "path": "../../core/session" },
+    { "path": "../../api/session-controller/tsconfig.host.json" },
+    { "path": "../../session/session-projection" },
+    { "path": "../../llm/llm" },
+    { "path": "../../llm/token-meter" },
+    { "path": "../../session/session-stats" },
+    { "path": "../../core/agent" },
+    { "path": "../../../vendor/cosmokit" },
+    { "path": "../../../vendor/cordis" },
+    { "path": "../../../vendor/schemastery" },
+    { "path": "../../core/system-prompt" }
+  ]
+}

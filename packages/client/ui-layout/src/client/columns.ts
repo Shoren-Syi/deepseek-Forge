@@ -9,24 +9,24 @@ export interface Columns { sidebar: number; center: number; rightbar: number }
 
 /** Center width protected while the normal right column is open. */
 export const CENTER_MIN = 400
-/** Sidebar drag clamp floor. */
-export const SIDEBAR_MIN = 264
+/** 导航栏保留任务名称和工作区操作所需的最小宽度。 */
+export const SIDEBAR_MIN = 200
 /** Sidebar drag clamp ceiling. */
 export const SIDEBAR_MAX = 420
-/** Sidebar width before any user drag. */
-export const SIDEBAR_DEFAULT = 280
+/** 默认给中央执行区更多空间；用户仍可拖动调整。 */
+export const SIDEBAR_DEFAULT = 224
 /** Closed-sidebar rail: a 24px icon column between 16px horizontal paddings. */
 export const SIDEBAR_COLLAPSED = 56
 /** Viewport width below which the sidebar auto-collapses to the rail (deepsuite
  * LG breakpoint); a manual toggle below it re-expands over the squeezed center
  * (stores.ts narrowExpanded). */
 export const SIDEBAR_AUTO_COLLAPSE = 1024
-/** Right column drag clamp floor. */
+/** 保留终端、文件和检查器共用的最小侧栏宽度。 */
 export const RIGHTBAR_MIN = 300
 /** Maximum normal right panel width as a fraction of the frame. */
 export const RIGHTBAR_MAX_RATIO = 0.7
-/** First-open right panel preference as a fraction of the frame. */
-export const RIGHTBAR_DEFAULT_RATIO = 0.45
+/** 首次打开检查器时采用蓝图中的窄侧栏比例。 */
+export const RIGHTBAR_DEFAULT_RATIO = 0.28
 
 /**
  * Clamp a panel width into its contract range.

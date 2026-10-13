@@ -301,6 +301,8 @@ export interface SessionCreateValue {
 /** Session model-selection request. */
 export interface SessionSelectModelRequest extends ModelSelection {
   readonly sessionId: SessionId
+  /** 自动路由设为 false，保留用户的全局默认模型；手动选择默认保存。 */
+  readonly rememberDefault?: boolean
 }
 
 /** Accepted model selection after Host resolution. */

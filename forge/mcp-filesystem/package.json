@@ -1,0 +1,9 @@
+{
+  "name": "forge-local-mcp",
+  "private": true,
+  "type": "module",
+  "description": "Forge 按需连接的本地文件 MCP 服务",
+  "dependencies": {
+    "@modelcontextprotocol/server-filesystem": "1.0.0"
+  }
+}

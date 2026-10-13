@@ -9,6 +9,8 @@ English | [中文](README.zh.md)
 
 ## Summary
 
+界面入口可通过 `invoke(id, context)` 调用已注册命令，沿用命令自己的目标解析、模态约束和操作实现。
+
 Customize application keyboard commands for each device. Desktop and Web choose separate defaults for the receiving device. Custom bindings survive reloads on the same device. Commands disappear when their owning plugin unloads, while their saved overrides remain available for reinstallation.
 
 Windows uses ` + ` between modifiers and the first ordinary key. Two simultaneous ordinary keys appear side by side, such as `F G`, on Windows and macOS Desktop, including tooltips and the shortcut reference.

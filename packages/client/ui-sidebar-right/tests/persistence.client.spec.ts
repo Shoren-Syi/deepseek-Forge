@@ -22,6 +22,21 @@ function storage() {
 const sessionId = 'first' as SessionId
 const seed = () => ({ kind: 'guide', title: 'Start' })
 
+it('restores all three tool panes and their selected content after reopening', () => {
+  storage()
+  const first = createSidebarRightStore(seed).create(sessionId)
+  first.actions.openContent(sessionId, { kind: 'text', contentId: 'file:a', title: 'A' }, () => {})
+  first.actions.splitPane(sessionId)
+  first.actions.openContent(sessionId, { kind: 'terminal', contentId: 'terminal:b', title: 'B' }, () => {})
+  first.actions.splitPane(sessionId)
+  first.actions.openContent(sessionId, { kind: 'auxiliary', contentId: 'auxiliary:c', title: 'C' }, () => {})
+  const before = first.getSnapshot().bySession[sessionId]!
+  const restored = createSidebarRightStore(seed).create(sessionId).getSnapshot().bySession[sessionId]!
+  expect(restored.layout).toEqual(before.layout)
+  expect(restored.minted).toBe(before.minted)
+  expect(Object.values(restored.layout.tabs).map(tab => tab.title)).toEqual(expect.arrayContaining(['A', 'B', 'C']))
+})
+
 it('restores current layout independently by Session with a fresh undo history', () => {
   storage()
   const handle = createSidebarRightStore(seed)

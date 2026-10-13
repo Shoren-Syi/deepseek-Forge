@@ -27,6 +27,8 @@ kind: "package-library"
 
 此公共实验性库是浏览器提供方的依赖。它没有插件入口或挂载配置。[浏览器操作服务](../../browser-use/browser-use/README.zh.md)保持独立于此库。
 
+空白会话在创建后切换到浏览器预设时，首次提示装配会等待同一套会话连接，并重新收集工具。连接失败直接阻止该次装配，不静默丢失浏览器能力；后续轮次复用连接，清理由原生会话资源管理器负责。
+
 原生提供方从包根入口构造 `SessionResources`，提供资源获取与清理回调。调用向 `run()` 传递确切的实时 Agent；失效的所有者与独占附加的第二个所有者在获取资源前失败。取消资源获取等待不会终止初始化，同一 Session 的其他调用方仍可继续等待；释放 Session 会中止并等待该初始化结束。提供方将注册保留到 `dispose()` 完成。
 
 MCP 提供方使用 `@deepseek-ai/dsh-experimental-browser-use-runtime/mcp` 中的 `mountSessionMcp`，提供固定服务器名称、可执行文件、参数与所有权策略。挂载上下文必须提供 `workingDirectory`。获取连接时通过[工作目录服务](../../session/working-directory/README.zh.md)验证或恢复当前目录，并将其设为 MCP 服务器进程的初始目录。Session 后续选择其他目录时，保留的服务器继续使用该目录。辅助库在每个后续 Agent 的 `agent/created` 事件中等待一次有作用域的客户端启动与发现尝试。Agent 创建或恢复在发现完成后结束，随后才运行排队输入；成功的客户端跨轮次归该 Session 所有。

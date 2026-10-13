@@ -38,9 +38,9 @@ it.each([
   ['invalid split sum', { minted: 4, layout: { ...splitLayout, nodes: { ...splitLayout.nodes, split3: { ...split, sizes: [0.4, 0.4] } } } }],
   ['mismatched split sizes', { minted: 4, layout: { ...splitLayout, nodes: { ...splitLayout.nodes, split3: { ...split, sizes: [0.2, 0.3, 0.5] } } } }],
   ['vertical split', { minted: 4, layout: { ...splitLayout, nodes: { ...splitLayout.nodes, split3: { ...split, axis: 'column' } } } }],
-  ['three docked panes', { minted: 5, layout: { ...splitLayout, nodes: {
-    ...splitLayout.nodes, pane5: { ...otherPane, id: 'pane5' },
-    split3: { ...split, children: ['pane1', 'pane4', 'pane5'], sizes: [0.3, 0.3, 0.4] },
+  ['four docked panes exceed the tool limit', { minted: 6, layout: { ...splitLayout, nodes: {
+    ...splitLayout.nodes, pane5: { ...otherPane, id: 'pane5' }, pane6: { ...otherPane, id: 'pane6' },
+    split3: { ...split, children: ['pane1', 'pane4', 'pane5', 'pane6'], sizes: [0.25, 0.25, 0.25, 0.25] },
   } } }],
   ['nested split', { minted: 6, layout: { ...splitLayout, nodes: {
     ...splitLayout.nodes, pane6: { ...otherPane, id: 'pane6' },

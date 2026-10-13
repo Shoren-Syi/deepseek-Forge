@@ -36,7 +36,7 @@ import type {
 } from '@deepseek-ai/dsh-client-ui-slots'
 import type {} from '../contract/slots.ts'
 import type { DockIntents, DockMode, FloatRect, TabId, TabRecord, TabRenderer } from '@deepseek-ai/dsh-client-ui-dockkit'
-import { canSplit, dockPaneIds, DockLayout, findPaneContentTab } from '@deepseek-ai/dsh-client-ui-dockkit'
+import { canSplit, dockPaneIds, DockLayout, findPaneContentTab, getPane } from '@deepseek-ai/dsh-client-ui-dockkit'
 import type { HalvesFit, LayoutState, PaneId } from '@deepseek-ai/dsh-client-ui-dockkit'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import { GUIDE_KIND, pageAddress } from '../contract/seed.ts'
@@ -45,6 +45,7 @@ import type { SidebarRightOpenTabOptions } from '../service.ts'
 import type { SidebarRightTabDefinition } from '../tab-registry.ts'
 import type { createSidebarRightStore, SurfaceState } from '../stores.ts'
 import { canCloseTab } from '../stores.ts'
+import { MAX_TOOL_PANES } from '../contract/layout.ts'
 import type { TabOccurrence } from '../tab-domain.ts'
 import type { SidebarRightTabNavigation } from '../contract/slots.ts'
 import type { TabHookContext } from '../tab-info.ts'
@@ -210,7 +211,7 @@ function TabSlot({
   }), [tab.id, seat, fullscreen, active, signal, tabActions, useStore, useTabNavigation, shortcuts])
   const content = renderSlot(seat, {}, { entryKey: definition?.id ?? tab.kind, fallback, hookContext })
   return seat === 'sidebar.right.pane.tab.title'
-    ? <span key={id} className={css.tabTitle} data-sidebar-right-tab={tab.id} data-sidebar-right-occurrence={id}>{content}</span>
+    ? <span key={id} className={css.tabTitle} data-sidebar-right-tab={tab.id} data-sidebar-right-tab-kind={tab.kind} data-sidebar-right-occurrence={id}>{content}</span>
     : <div key={id} className={css.tabBody} data-sidebar-right-tab={tab.id} data-sidebar-right-occurrence={id}>{content}</div>
 }
 
@@ -303,6 +304,8 @@ function SidebarPanel(panel: PanelProps & { width: number; panelRef: RefObject<H
   const { sessionId, surface, actions, t, renderSlot, openTab, width, reportRoom, fullscreen, panelRef } = panel
   const { expanded } = surface.layout
   const types = panel.useTabTypes(value => value)
+  const selectedPane = getPane(surface.layout, surface.layout.activePaneId)
+  const selectedTab = selectedPane.activeTabId === undefined ? undefined : surface.layout.tabs[selectedPane.activeTabId]
   return (
     <div
       ref={panelRef}
@@ -312,13 +315,15 @@ function SidebarPanel(panel: PanelProps & { width: number; panelRef: RefObject<H
       data-sidebar-right-session={sessionId}
       data-sidebar-right-panel={fullscreen ? 'fullscreen' : 'push'}
       data-sidebar-right-open={expanded || undefined}
+      data-sidebar-right-current={panel.active || undefined}
+      data-sidebar-right-active-kind={selectedPane.host === 'dock' ? selectedTab?.kind : undefined}
       // Dockkit hides individual docked hosts; floating descendants remain accessible.
       aria-hidden={(!expanded && surface.layout.floats.length === 0) || undefined}
     >
       <div className={css.panelBody}>
         <DockLayout
           state={surface.layout}
-          canSplit={canSplit(surface.layout) && dockPaneIds(surface.layout).length < 2}
+          canSplit={canSplit(surface.layout) && dockPaneIds(surface.layout).length < MAX_TOOL_PANES}
           dropZones="horizontal"
           minPaneFraction={0.2}
           canAddTab={paneId => guideIn(surface.layout, paneId) === undefined}
@@ -371,7 +376,8 @@ export function RightbarSeat({
   }, [actions, sessionId, surface, active])
 
   useLayoutEffect(() => {
-    if (shown && !fullscreen && !canShow) actions.setExpanded(sessionId, false)
+    // 顶部工具区可能有实际空间，即使原侧栏的横向栏宽计算为零。
+    if (shown && !fullscreen && !canShow && panelRef.current?.clientWidth === 0) actions.setExpanded(sessionId, false)
   }, [actions, sessionId, shown, fullscreen, canShow])
 
   // Read only when the fullscreen command runs, after this commit has settled.

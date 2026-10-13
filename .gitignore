@@ -47,3 +47,7 @@ worktrees/
 .agents/worktrees/
 .typert-*/
 native/system/test/bin/
+
+/forge/.local/
+/forge/workspace/
+/apps/desktop/.forge-package-build/

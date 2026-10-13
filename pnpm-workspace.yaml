@@ -23,6 +23,13 @@ peerDependencyRules:
   allowedVersions:
     typescript: '>=5 <7'
 
+# Forge 首版不包含 Office 转换与 Claude Code 本地引擎。
+ignoredOptionalDependencies:
+  - '@anthropic-ai/claude-agent-sdk-win32-x64'
+
+# 依赖在安装步骤处理，运行构建或应用时不再自动重装。
+verifyDepsBeforeRun: false
+
 # pnpm 10+ blocks any dependency shipping an install/build script until it is
 # explicitly reviewed here (strictDepBuilds defaults to true: an unlisted script
 # is a hard install error). Every such package MUST be listed; we deny by

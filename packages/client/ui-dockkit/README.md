@@ -9,6 +9,8 @@ English | [中文](README.zh.md)
 
 ## Summary
 
+`DockLayout` 按水平分栏模型渲染每一列及相邻分隔线，切换或增加面板时保留已有标签内容的 DOM 节点。可同时打开的功能数量由调用方的面板策略决定。
+
 A docking layout kit: a split tree of tabbed panes with invertible operations, and the components that render and drive it. The Harness Web client is its first embedder; nothing in here knows that.
 
 > **Internal engine.** This package is published because the Sidebar links it statically, not as a stable API: its exports — `LayoutState`, `LayoutOp`, the planners, `DockIntents`, `DockLabels`, `DockMode` — may change in any release, and none of them appears in a service interface (`ctx.sidebarRight` exposes operations, never layout snapshots or operation logs).

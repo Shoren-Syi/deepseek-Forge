@@ -4,6 +4,7 @@ import { join, resolve } from 'node:path'
 
 const APP_ROOT = resolve(import.meta.dirname, '..')
 const BUILD_ROOT = join(APP_ROOT, '.desktop-build')
+const TARGET_ROOT = process.env.DSH_DESKTOP_BUILD_ROOT === undefined ? BUILD_ROOT : resolve(process.env.DSH_DESKTOP_BUILD_ROOT)
 const SUPPORTED_TARGETS = new Set(['mac-arm64', 'mac-x64', 'win-x64'])
 
 /**
@@ -42,7 +43,7 @@ function assertSupportedTarget(target) {
  */
 export function desktopTargetBuildPaths(target) {
   assertSupportedTarget(target)
-  const root = join(BUILD_ROOT, 'targets', target)
+  const root = join(TARGET_ROOT, 'targets', target)
   const packed = join(root, 'packed')
   return {
     root,

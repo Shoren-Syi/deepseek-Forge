@@ -141,15 +141,17 @@ describe('createSidebarRightStore — the sequence', () => {
     expect(dockPaneIds(layout())).toEqual([secondPane])
   })
 
-  it('allows two docked panes and rejects further splits without recording', () => {
+  it('allows three docked panes and rejects further splits without recording', () => {
     const { actions, layout, entries, expand } = harness()
     expand()
     actions.splitPane(SESSION)
     expect(dockPaneIds(layout())).toHaveLength(2)
+    actions.splitPane(SESSION)
+    expect(dockPaneIds(layout())).toHaveLength(3)
     const before = entries()
     const settled = vi.fn()
     actions.splitPane(SESSION, undefined, settled)
-    expect(dockPaneIds(layout())).toHaveLength(2)
+    expect(dockPaneIds(layout())).toHaveLength(3)
     expect(entries()).toBe(before)
     expect(settled).not.toHaveBeenCalled()
   })
@@ -168,6 +170,8 @@ describe('createSidebarRightStore — the sequence', () => {
     expect(getSplit(layout(), split).sizes).toEqual([0.2, 0.8])
     actions.resizeSplit(SESSION, split, [0.99, 0.01])
     expect(getSplit(layout(), split).sizes).toEqual([0.8, 0.2])
+    actions.splitPane(SESSION)
+    expect(dockPaneIds(layout())).toHaveLength(3)
     const splitCount = entries()
     actions.dropTab(SESSION, guide(), layout().activePaneId, 'right')
     expect(entries()).toBe(splitCount)

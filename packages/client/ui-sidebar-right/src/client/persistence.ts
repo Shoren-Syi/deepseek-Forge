@@ -2,6 +2,7 @@
 import { z } from 'zod'
 import { EMPTY_HISTORY, type LayoutState } from '@deepseek-ai/dsh-client-ui-dockkit'
 import type { SurfaceState } from './stores.ts'
+import { MAX_TOOL_PANES } from './contract/layout.ts'
 
 /** Persistence namespace shared by scoped stores and startup discovery. */
 export const sidebarPersistence = 'dsh.sidebar-right.v1'
@@ -38,7 +39,7 @@ function validateReferences(value: z.infer<typeof surface>): void {
     if (visited.has(id) || entry === undefined) reject()
     visited.add(id)
     if (entry.kind === 'split') {
-      if (host !== 'dock' || id !== layout.rootId || entry.axis !== 'row' || entry.children.length !== 2
+      if (host !== 'dock' || id !== layout.rootId || entry.axis !== 'row' || entry.children.length > MAX_TOOL_PANES
         || entry.children.length !== entry.sizes.length
         || Math.abs(entry.sizes.reduce((sum, size) => sum + size, 0) - 1) > 1e-9) reject()
       pending.push(...entry.children.map(id => ({ id, host })))

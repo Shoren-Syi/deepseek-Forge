@@ -8,6 +8,7 @@ import type {
   ConversationLocationDataSource, ConversationLocationDataStore, ConversationTurnDataMap, TurnLocation,
 } from '@deepseek-ai/dsh-client-ui-conversation/client'
 import { SessionSeq } from '@deepseek-ai/dsh-session/types'
+import type { SessionEventMap } from '@deepseek-ai/dsh-session/types'
 import type { TurnTokenUsage } from '../src/client/contract/chat-nodes.ts'
 import {
   sameTurnNavigationItem, turnNavigationItem,
@@ -291,6 +292,7 @@ export function chatSnapshotFixture(input: {
   readonly turnTimings?: LegacyConversationSlice['turnTimings']
   /** Recorded ends exist without starts; missing end times follow the fixture's seq × 1000 convention. */
   readonly turnEnds?: LegacyConversationSlice['turnEnds']
+  readonly turnEndReasons?: ReadonlyMap<number, SessionEventMap['turn/end']['reason']>
   /** Per-turn usage buckets; production derives these from session events. */
   readonly turnUsages?: ReadonlyMap<number, TurnTokenUsage> | undefined
 } = {}, previous?: ChatSnapshot): ChatSnapshot {
@@ -322,7 +324,7 @@ export function chatSnapshotFixture(input: {
       },
       end: endSeq === undefined ? undefined : {
         type: 'turn/end', seq: SessionSeq(endSeq), time: timing?.endTime ?? endSeq * 1000,
-        data: { turn, reason: { kind: 'completed' } },
+        data: { turn, reason: input.turnEndReasons?.get(turn) ?? { kind: 'completed' } },
       },
       status: endSeq === undefined ? 'open' : 'closed',
       steps: EMPTY,
